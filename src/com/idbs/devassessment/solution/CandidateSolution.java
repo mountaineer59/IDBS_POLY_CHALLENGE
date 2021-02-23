@@ -30,7 +30,7 @@ public class CandidateSolution extends CandidateSolutionBase
          * 
          */
 
-        return DifficultyLevel.LEVEL_2;
+        return DifficultyLevel.LEVEL_1;
     }
 
 
@@ -63,17 +63,10 @@ public class CandidateSolution extends CandidateSolutionBase
 
         } else if( getDifficultyLevel() == DifficultyLevel.LEVEL_2){
 
-            return handleLevelTwo();
+            return handleLevel();
         } else if(getDifficultyLevel() == DifficultyLevel.LEVEL_3){
-            /*
-            add here
-             */
+            return handleLevel();
 
-
-            /*
-            till here
-             */
-            return "";
         } else {
 
             return "";
@@ -84,7 +77,7 @@ public class CandidateSolution extends CandidateSolutionBase
     handles level 2
     this level has varied inputs
      */
-    private String handleLevelTwo() {
+    private String handleLevel() {
         String dataForQuestion = getDataForQuestion();
 
         if (dataForQuestion.startsWith("json")){
@@ -172,11 +165,19 @@ public class CandidateSolution extends CandidateSolutionBase
                 long finalProd = multiply(Integer.parseInt(coeff),xValProd);
 
                 if(operation.equals("add")){
-                    polynomial = polynomial + finalProd;
+                    // here
+                    if (getDifficultyLevel() == DifficultyLevel.LEVEL_2)
+                        polynomial = polynomial + finalProd;
+                    else if (getDifficultyLevel() == DifficultyLevel.LEVEL_3)
+                        polynomial = DigitalTaxTracker.add(polynomial, finalProd);
+
                 } else if(operation.equals("subtract")){
-                    polynomial = polynomial - finalProd;
+                    // here
+                    if (getDifficultyLevel() == DifficultyLevel.LEVEL_2)
+                        polynomial = polynomial - finalProd;
+                    else if (getDifficultyLevel() == DifficultyLevel.LEVEL_3)
+                        polynomial = DigitalTaxTracker.substract(polynomial, finalProd);
                 }
-                System.out.println("polynomial" + polynomial);
             }
         }
         return polynomial;
@@ -230,8 +231,9 @@ public class CandidateSolution extends CandidateSolutionBase
              int multiplier = jsonArray.getJsonObject(i).getInt("multiplier");
 
             //check the condition
-             if(multiplier > 10 || multiplier < 0 || power < 0)
+             if(multiplier > 10 || multiplier < 0 || power < 0){
                  return null;
+             }
              String action = jsonArray.getJsonObject(i).getString("action");
             long xValueProd = 1;
             for(int j = 1; j <= power; j = j + 1){
@@ -240,10 +242,18 @@ public class CandidateSolution extends CandidateSolutionBase
 
             long currentTerm = multiply(multiplier, xValueProd);
             if(action.equals("add")){
-                polynomialAnswer = polynomialAnswer + currentTerm;
+                // here
+                if (getDifficultyLevel() == DifficultyLevel.LEVEL_3)
+                    polynomialAnswer = DigitalTaxTracker.add(polynomialAnswer, currentTerm);
+                else
+                    polynomialAnswer = polynomialAnswer + currentTerm;
+
             } else if(action.equals("subtract")){
-                polynomialAnswer = polynomialAnswer - currentTerm;
-//                DigitalTaxTracker.substract(polynomialAnswer,currentTerm);
+                // here
+                if (getDifficultyLevel() == DifficultyLevel.LEVEL_3)
+                    polynomialAnswer = DigitalTaxTracker.substract(polynomialAnswer,currentTerm);
+                else
+                    polynomialAnswer = polynomialAnswer - currentTerm;
 
             }
         }
@@ -258,9 +268,12 @@ public class CandidateSolution extends CandidateSolutionBase
     private long multiply(int multiplier, long xValueProd) {
         long added = 0;
         for(int i = 1; i <= multiplier; i = i + 1){
-            added = added + xValueProd;
-//            if(getDifficultyLevel() == DifficultyLevel.LEVEL_3)
-//                DigitalTaxTracker.add(multiplier, xValueProd);
+            // here
+            if(getDifficultyLevel() == DifficultyLevel.LEVEL_3)
+                added = DigitalTaxTracker.add(added, xValueProd);
+            else
+                added = added + xValueProd;
+
         }
         return added;
     }
