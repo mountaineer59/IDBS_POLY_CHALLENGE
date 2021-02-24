@@ -30,9 +30,8 @@ public class CandidateSolution extends CandidateSolutionBase
          * 
          */
 
-        return DifficultyLevel.LEVEL_1;
+        return DifficultyLevel.LEVEL_3;
     }
-
 
     @Override
     public String getAnswer() throws IDBSSolutionException
@@ -52,23 +51,17 @@ public class CandidateSolution extends CandidateSolutionBase
 
 
     /*
-
       extracts terms of equation from given JSON data.
      */
     private String handleAllDifficultyLevel() {
         if(getDifficultyLevel() == DifficultyLevel.LEVEL_1){
             String json = getDataForQuestion();
-
             return getValsFromJSON(json);
-
         } else if( getDifficultyLevel() == DifficultyLevel.LEVEL_2){
-
             return handleLevel();
         } else if(getDifficultyLevel() == DifficultyLevel.LEVEL_3){
             return handleLevel();
-
         } else {
-
             return "";
         }
     }
@@ -80,25 +73,19 @@ public class CandidateSolution extends CandidateSolutionBase
     private String handleLevel() {
         String dataForQuestion = getDataForQuestion();
 
-        if (dataForQuestion.startsWith("json")){
+        if (dataForQuestion.startsWith(Constants.JSON)){
             String requiredString = dataForQuestion.substring(5);
-
             return getValsFromJSON(requiredString);
-
-        } else if(dataForQuestion.startsWith("numeric")){
-            //remove "numeric:" from the string
-            String requiredString = dataForQuestion.substring(8);
-
-            //seperate "x = ..." and "y = ..." and put them in "terms"
-            String[] terms = requiredString.split(";");//splits the string based on whitespace
+        } else if(dataForQuestion.startsWith(Constants.NUMERIC)){
+            String requiredString = dataForQuestion.substring(8);//remove "numeric:" from the string
+            String[] terms = requiredString.split(Constants.SEMI_COLON);//seperate "x = ..." and "y = ..." and put them in "terms"
             String xVal = "";
             String equation = "";
-
             for(String t:terms){
-                if(t.startsWith("x")){
+                if(t.startsWith(Constants.X_FROM_EQUATION)){
                     xVal = t.substring(4);
                 }
-                if(t.startsWith(" y")){
+                if(t.startsWith(Constants.Y_FROM_EQUATION)){
                     equation = t.substring(4);
                 }
             }
@@ -110,36 +97,31 @@ public class CandidateSolution extends CandidateSolutionBase
     }
 
     /*
-    extracts values from the equation and builds the polynomial & calls subsequent functions
+    Extracts values from the equation and builds the polynomial & calls subsequent functions
+    Approach : first, we separate the terms by "-" sign. We can straightaway subtract those separated terms.
+    Some terms may be grouped together because they have "+" sign in them.
      */
     private String buildEquation(String xVal, String equation) {
         if(xVal != "" && equation != ""){
-            long polynomial = 0;
-
-            String[] parts = equation.substring(1).split("-");
-
-            /*
-            first, we separate the terms by "-" sign. We can straightaway subtract those separated terms.
-            Some terms may be grouped together because they have "+" sign in them.
-             */
-
+            Long polynomial = Long.valueOf(0);
+            String[] parts = equation.substring(1).split(Constants.HYPHEN);
             //"parts" is seperated by negative signs
             for(String p: parts) {
-                if(p.contains("+") || p.startsWith(" +")|| p.startsWith("+")){
-                    String[] plusSepTerms =  p.split("\\+");
+                if(p.contains(Constants.PLUS_STRING) || p.startsWith(Constants.PLUS_STRING)){
+                    String[] plusSepTerms =  p.split(Constants.PLUS_SIGN);
                     for(int k = 0; k < plusSepTerms.length; k++){
                         //add all other terms
                         if(k != 0){
                             //add
-                            polynomial = getPolynomialValue(xVal, polynomial, plusSepTerms[k],"add");
+                            polynomial = getPolynomialValue(xVal, polynomial, plusSepTerms[k], Constants.ADD);
                         } else {
                             // subtract the first term only because its separated by "-"
-                            polynomial = getPolynomialValue(xVal, polynomial, plusSepTerms[k],"subtract");
+                            polynomial = getPolynomialValue(xVal, polynomial, plusSepTerms[k],Constants.SUBTRACT);
                         }
                     }
                 } else {
                     //subtract
-                    polynomial = getPolynomialValue(xVal, polynomial, p,"subtract");
+                    polynomial = getPolynomialValue(xVal, polynomial, p,Constants.SUBTRACT);
                 }
             }
             return Long.toString(polynomial);
@@ -150,33 +132,27 @@ public class CandidateSolution extends CandidateSolutionBase
     /*
     helper function
      */
-    private long getPolynomialValue(String xVal, long polynomial, String plusSepTerm, String operation) {
+    private Long getPolynomialValue(String xVal, Long polynomial, String plusSepTerm, String operation) {
         String s = plusSepTerm;
 
         for(int i = 0; i < s.length(); i++){
-            if(s.charAt(i) == '.'){
+            if(s.charAt(i) == Constants.DOT_OPERATOR){
                 String coeff = s.substring(0,i);
-                String power = s.substring(s.indexOf("^")+1);
-                long xValProd = 1;
-
+                String power = s.substring(s.indexOf(Constants.POWER_OPERATOR)+1);
+                Long xValProd = Long.valueOf(1);
                 for(int j =1;j<=Integer.parseInt(power); j=j+1){
                     xValProd = multiply(Integer.parseInt(xVal),xValProd);
                 }
-                long finalProd = multiply(Integer.parseInt(coeff),xValProd);
-
-                if(operation.equals("add")){
+                Long finalProd = multiply(Integer.parseInt(coeff),xValProd);
+                if(operation.equalsIgnoreCase(Constants.ADD)){
                     // here
-                    if (getDifficultyLevel() == DifficultyLevel.LEVEL_2)
-                        polynomial = polynomial + finalProd;
-                    else if (getDifficultyLevel() == DifficultyLevel.LEVEL_3)
-                        polynomial = DigitalTaxTracker.add(polynomial, finalProd);
+                    if (getDifficultyLevel() == DifficultyLevel.LEVEL_2) polynomial = polynomial + finalProd;
+                    else if (getDifficultyLevel() == DifficultyLevel.LEVEL_3) polynomial = DigitalTaxTracker.add(polynomial, finalProd);
 
-                } else if(operation.equals("subtract")){
+                } else if(operation.equalsIgnoreCase(Constants.SUBTRACT)){
                     // here
-                    if (getDifficultyLevel() == DifficultyLevel.LEVEL_2)
-                        polynomial = polynomial - finalProd;
-                    else if (getDifficultyLevel() == DifficultyLevel.LEVEL_3)
-                        polynomial = DigitalTaxTracker.substract(polynomial, finalProd);
+                    if (getDifficultyLevel() == DifficultyLevel.LEVEL_2) polynomial = polynomial - finalProd;
+                    else if (getDifficultyLevel() == DifficultyLevel.LEVEL_3) polynomial = DigitalTaxTracker.substract(polynomial, finalProd);
                 }
             }
         }
@@ -194,22 +170,12 @@ public class CandidateSolution extends CandidateSolutionBase
 
         // now start extracting the data you need from the json....
 
-        // get the xValue from the Json
-        int xValue = jsonObject.getInt("xValue");
-
-        // read the terms array from the json
-        JsonArray jsonArray = jsonObject.getJsonArray("terms");
-
-        //check the condition
-        if (xValue > 50 || xValue < 0)
-            return "";
-        //check the condition
-        if (jsonArray.size() > 10)
-            return "";
-
+        Integer xValue = jsonObject.getInt(Constants.X_VALUE);// get the xValue from the Json
+        JsonArray jsonArray = jsonObject.getJsonArray(Constants.TERMS);// read the terms array from the json
+        if (xValue > 50 || xValue < 0) return "";//check the condition
+        if (jsonArray.size() > 10) return "";//check the condition
         Long polynomialAnswer = calculateAnswer(xValue, jsonArray);
         if (polynomialAnswer == null) return "";
-
         return Long.toString(polynomialAnswer);
     }
 
@@ -220,41 +186,28 @@ public class CandidateSolution extends CandidateSolutionBase
     - takes value of x , JsonArray of terms
     - returns long
      */
-    private Long calculateAnswer(int xValue, JsonArray jsonArray) {
+    private Long calculateAnswer(Integer xValue, JsonArray jsonArray) {
         // now create the polynomial
-        long polynomialAnswer = 0;
+        Long polynomialAnswer = Long.valueOf(0);
 
         for (int i = 0; i < jsonArray.size(); i++)
         {
+             Integer power = jsonArray.getJsonObject(i).getInt(Constants.POWER);
+             Integer multiplier = jsonArray.getJsonObject(i).getInt(Constants.MULTIPLIER);
 
-             int power = jsonArray.getJsonObject(i).getInt("power");
-             int multiplier = jsonArray.getJsonObject(i).getInt("multiplier");
-
-            //check the condition
-             if(multiplier > 10 || multiplier < 0 || power < 0){
-                 return null;
-             }
-             String action = jsonArray.getJsonObject(i).getString("action");
-            long xValueProd = 1;
+            if(multiplier > 10 || multiplier < 0 || power < 0) return null;//check the condition
+            String action = jsonArray.getJsonObject(i).getString(Constants.ACTION);
+            Long xValueProd = Long.valueOf(1);
             for(int j = 1; j <= power; j = j + 1){
                 xValueProd = multiply(xValue,xValueProd);
             }
-
-            long currentTerm = multiply(multiplier, xValueProd);
-            if(action.equals("add")){
-                // here
-                if (getDifficultyLevel() == DifficultyLevel.LEVEL_3)
-                    polynomialAnswer = DigitalTaxTracker.add(polynomialAnswer, currentTerm);
-                else
-                    polynomialAnswer = polynomialAnswer + currentTerm;
-
-            } else if(action.equals("subtract")){
-                // here
-                if (getDifficultyLevel() == DifficultyLevel.LEVEL_3)
-                    polynomialAnswer = DigitalTaxTracker.substract(polynomialAnswer,currentTerm);
-                else
-                    polynomialAnswer = polynomialAnswer - currentTerm;
-
+            Long currentTerm = multiply(multiplier, xValueProd);
+            if(action.equalsIgnoreCase(Constants.ADD)){
+                if (getDifficultyLevel() == DifficultyLevel.LEVEL_3) polynomialAnswer = DigitalTaxTracker.add(polynomialAnswer, currentTerm);
+                else polynomialAnswer = polynomialAnswer + currentTerm;
+            } else if(action.equalsIgnoreCase(Constants.SUBTRACT)){
+                if (getDifficultyLevel() == DifficultyLevel.LEVEL_3) polynomialAnswer = DigitalTaxTracker.substract(polynomialAnswer, currentTerm);
+                else polynomialAnswer = polynomialAnswer - currentTerm;
             }
         }
         return polynomialAnswer;
@@ -265,17 +218,36 @@ public class CandidateSolution extends CandidateSolutionBase
     /*
     generic method for multiplication using addition
      */
-    private long multiply(int multiplier, long xValueProd) {
-        long added = 0;
-        for(int i = 1; i <= multiplier; i = i + 1){
-            // here
-            if(getDifficultyLevel() == DifficultyLevel.LEVEL_3)
-                added = DigitalTaxTracker.add(added, xValueProd);
-            else
+    private Long multiply(Integer multiplier, Long xValueProd) {
+        Long added = Long.valueOf(0);
+        if(getDifficultyLevel() == DifficultyLevel.LEVEL_3){
+            if(isEven(multiplier)){
+                for(int i = 1; i <= multiplier; i = i + 2){
+                    added = DigitalTaxTracker.add(added, xValueProd + xValueProd);
+                }
+            } else {
+                for(int i = 1; i <= multiplier; i = i + 1){
+                    added = DigitalTaxTracker.add(added, xValueProd);
+                }
+            }
+        } else {
+            for(int i = 1; i <= multiplier; i = i + 1){
                 added = added + xValueProd;
-
+            }
         }
         return added;
+    }
+
+    /*
+    check if even without modulus operator
+     */
+    private Boolean isEven(Integer n)
+    {
+        Boolean isEven = true;
+        for (int i = 1; i <= n; i = i + 1){
+            isEven = !isEven;
+        }
+        return isEven;
     }
 
 }
