@@ -67,7 +67,7 @@ public class CandidateSolution extends CandidateSolutionBase
     }
 
     /*
-    handles level 2
+    handles level 2 and 3
     this level has varied inputs
      */
     private String handleLevel() {
@@ -218,7 +218,7 @@ public class CandidateSolution extends CandidateSolutionBase
     /*
     generic method for multiplication using addition
      */
-    private Long multiply(Integer multiplier, Long xValueProd) {
+    protected Long multiply(Integer multiplier, Long xValueProd) {
         Long added = Long.valueOf(0);
         if(getDifficultyLevel() == DifficultyLevel.LEVEL_3){
             if(isEven(multiplier)){
@@ -241,8 +241,7 @@ public class CandidateSolution extends CandidateSolutionBase
     /*
     check if even without modulus operator
      */
-    private Boolean isEven(Integer n)
-    {
+    protected Boolean isEven(Integer n) {
         Boolean isEven = true;
         for (int i = 1; i <= n; i = i + 1){
             isEven = !isEven;
