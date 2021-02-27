@@ -18,5 +18,7 @@ class CandidateSolutionTest {
     void testMultiply() {
         CandidateSolution candidateSolution = new CandidateSolution();
         assertEquals(6,candidateSolution.multiply(2, Long.valueOf(3)));
+        assertEquals(9,candidateSolution.multiply(3, Long.valueOf(3)));
+
     }
 }

@@ -57,12 +57,8 @@ public class CandidateSolution extends CandidateSolutionBase
         if(getDifficultyLevel() == DifficultyLevel.LEVEL_1){
             String json = getDataForQuestion();
             return getValsFromJSON(json);
-        } else if( getDifficultyLevel() == DifficultyLevel.LEVEL_2){
-            return handleLevel();
-        } else if(getDifficultyLevel() == DifficultyLevel.LEVEL_3){
-            return handleLevel();
         } else {
-            return "";
+            return handleNextLevels();
         }
     }
 
@@ -70,7 +66,7 @@ public class CandidateSolution extends CandidateSolutionBase
     handles level 2 and 3
     this level has varied inputs
      */
-    private String handleLevel() {
+    private String handleNextLevels() {
         String dataForQuestion = getDataForQuestion();
 
         if (dataForQuestion.startsWith(Constants.JSON)){
@@ -214,16 +210,17 @@ public class CandidateSolution extends CandidateSolutionBase
     }
 
 
-
     /*
-    generic method for multiplication using addition
+    method for multiplication using addition..also handles appropriate difficulty level.
      */
     protected Long multiply(Integer multiplier, Long xValueProd) {
         Long added = Long.valueOf(0);
         if(getDifficultyLevel() == DifficultyLevel.LEVEL_3){
+            long doubledXValProd = DigitalTaxTracker.add(xValueProd , xValueProd);
+
             if(isEven(multiplier)){
                 for(int i = 1; i <= multiplier; i = i + 2){
-                    added = DigitalTaxTracker.add(added, xValueProd + xValueProd);
+                    added = DigitalTaxTracker.add(added, doubledXValProd);
                 }
             } else {
                 for(int i = 1; i <= multiplier; i = i + 1){
