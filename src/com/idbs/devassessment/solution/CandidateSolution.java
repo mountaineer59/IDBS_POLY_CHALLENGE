@@ -63,7 +63,7 @@ public class CandidateSolution extends CandidateSolutionBase
     }
 
     /*
-    handles level 2 and 3
+    level 2 and 3 are handled in multiply level.
     this level has varied inputs
      */
     private String handleNextLevels() {
