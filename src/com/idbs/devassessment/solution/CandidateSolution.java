@@ -30,7 +30,7 @@ public class CandidateSolution extends CandidateSolutionBase
          * 
          */
 
-        return DifficultyLevel.LEVEL_3;
+        return DifficultyLevel.LEVEL_2;
     }
 
     @Override
@@ -43,9 +43,47 @@ public class CandidateSolution extends CandidateSolutionBase
          * this in the assessment application and you'll see many examples of the Json that question produces.
          */
 
-        String result = handleAllDifficultyLevel();
 
-        return result;
+
+        /*
+        Solution implemented using adapter pattern
+         */
+        if(getDifficultyLevel() == DifficultyLevel.LEVEL_1){
+            String json = getDataForQuestion();
+            LevelOne levelOne = new LevelOne();
+            String result = levelOne.parseEquation(json);
+            return result;
+
+        } else if(getDifficultyLevel() == DifficultyLevel.LEVEL_2){
+
+            String dataForQuestion = getDataForQuestion();
+
+            LevelTwoAdapter levelTwoAdapter = new LevelTwoAdapter(new LevelTwo());
+            String result =  levelTwoAdapter.parseEquation(dataForQuestion);
+            return result;
+
+        } else if(getDifficultyLevel() == DifficultyLevel.LEVEL_3){
+
+            String dataForQuestion = getDataForQuestion();
+            LevelThreeAdapter levelThreeAdapter = new LevelThreeAdapter(new LevelThree());
+            String result =  levelThreeAdapter.parseEquation(dataForQuestion);
+            return result;
+
+        } else if(getDifficultyLevel() == DifficultyLevel.IDBS_EXAMPLE){
+
+            return "";
+        }
+
+        else {
+
+            return "unknown level";
+        }
+
+        /*
+        Solution implemented using normal function calls
+         */
+//        String result = handleAllDifficultyLevel();
+//        return result;
     }
 
 
