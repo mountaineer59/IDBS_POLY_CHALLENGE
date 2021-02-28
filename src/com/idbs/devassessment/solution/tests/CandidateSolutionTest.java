@@ -1,5 +1,8 @@
-package com.idbs.devassessment.solution;
+package com.idbs.devassessment.solution.tests;
 
+import com.idbs.devassessment.solution.CandidateSolution;
+import com.idbs.devassessment.solution.LevelOne;
+import com.idbs.devassessment.solution.constants.Constants;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,4 +24,13 @@ class CandidateSolutionTest {
         assertEquals(9,candidateSolution.multiply(3, Long.valueOf(3)));
 
     }
+
+    @Test
+    void testParseEquation(){
+        LevelOne levelOne = new LevelOne();
+        assertEquals(Constants.ERROR_MESSAGE, levelOne.parseEquation(""));
+
+    }
+
+
 }

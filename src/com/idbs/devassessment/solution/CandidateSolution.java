@@ -14,6 +14,9 @@ import javax.json.JsonReader;
 import com.idbs.devassessment.core.IDBSSolutionException;
 import com.idbs.devassessment.core.DifficultyLevel;
 import com.idbs.devassessment.harness.DigitalTaxTracker;
+import com.idbs.devassessment.solution.adapters.LevelThreeAdapter;
+import com.idbs.devassessment.solution.adapters.LevelTwoAdapter;
+import com.idbs.devassessment.solution.constants.Constants;
 
 /**
  * Example solution for the example question
@@ -46,12 +49,13 @@ public class CandidateSolution extends CandidateSolutionBase
 
 
         /*
-        Solution implemented using adapter pattern
+        Solution implemented using "Adapter" design pattern
          */
+        String result = "";
         if(getDifficultyLevel() == DifficultyLevel.LEVEL_1){
             String json = getDataForQuestion();
             LevelOne levelOne = new LevelOne();
-            String result = levelOne.parseEquation(json);
+             result = levelOne.parseEquation(json);
             return result;
 
         } else if(getDifficultyLevel() == DifficultyLevel.LEVEL_2){
@@ -59,31 +63,29 @@ public class CandidateSolution extends CandidateSolutionBase
             String dataForQuestion = getDataForQuestion();
 
             LevelTwoAdapter levelTwoAdapter = new LevelTwoAdapter(new LevelTwo());
-            String result =  levelTwoAdapter.parseEquation(dataForQuestion);
+             result =  levelTwoAdapter.parseEquation(dataForQuestion);
             return result;
 
         } else if(getDifficultyLevel() == DifficultyLevel.LEVEL_3){
 
             String dataForQuestion = getDataForQuestion();
             LevelThreeAdapter levelThreeAdapter = new LevelThreeAdapter(new LevelThree());
-            String result =  levelThreeAdapter.parseEquation(dataForQuestion);
+             result =  levelThreeAdapter.parseEquation(dataForQuestion);
             return result;
 
-        } else if(getDifficultyLevel() == DifficultyLevel.IDBS_EXAMPLE){
-
-            return "";
         }
-
         else {
-
-            return "unknown level";
+            result = Constants.UNKNOWN_STRING;
+            return result;
         }
 
         /*
         Solution implemented using normal function calls
+        Please uncomment following two lines and comment out "adapter pattern code" to test the code using this approach
          */
 //        String result = handleAllDifficultyLevel();
 //        return result;
+
     }
 
 
@@ -251,7 +253,7 @@ public class CandidateSolution extends CandidateSolutionBase
     /*
     method for multiplication using addition..also handles appropriate difficulty level.
      */
-    protected Long multiply(Integer multiplier, Long xValueProd) {
+    public Long multiply(Integer multiplier, Long xValueProd) {
         Long added = Long.valueOf(0);
         if(getDifficultyLevel() == DifficultyLevel.LEVEL_3){
             long doubledXValProd = DigitalTaxTracker.add(xValueProd , xValueProd);
@@ -276,7 +278,7 @@ public class CandidateSolution extends CandidateSolutionBase
     /*
     check if even without modulus operator
      */
-    protected Boolean isEven(Integer n) {
+    public Boolean isEven(Integer n) {
         Boolean isEven = true;
         for (int i = 1; i <= n; i = i + 1){
             isEven = !isEven;
